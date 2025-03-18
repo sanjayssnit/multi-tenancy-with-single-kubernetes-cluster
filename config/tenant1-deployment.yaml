@@ -1,0 +1,35 @@
+# tenant1-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-boot-app
+  namespace: tenant1
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: spring-boot-app
+  template:
+    metadata:
+      labels:
+        app: spring-boot-app
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: tenant
+                operator: In
+                values:
+                - a
+      tolerations:
+      - key: "tenant"
+        operator: "Equal"
+        value: "a"
+        effect: "NoSchedule"
+      containers:
+      - name: spring-boot
+        image: springio/gs-spring-boot-docker
+        ports:
+        - containerPort: 8080
